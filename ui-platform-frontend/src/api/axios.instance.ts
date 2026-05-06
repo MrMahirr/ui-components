@@ -1,22 +1,20 @@
 import axios from 'axios';
 
-// Backend'in çalıştığı URL ve API prefix'i
-const API_BASE_URL = 'http://localhost:3000/api';
+// İleride .env dosyasına taşıyabilirsin (örn: import.meta.env.VITE_API_URL)
+const BASE_URL = 'http://localhost:3000';
 
-export const apiClient = axios.create({
-    baseURL: API_BASE_URL,
-    timeout: 10000,
+export const axiosInstance = axios.create({
+    baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Response Interceptor: Gelen veriyi doğrudan temiz bir şekilde dönmek
-// ve global API hatalarını (örneğin 500 hataları) loglamak için
-apiClient.interceptors.response.use(
-    (response) => response.data,
+// İhtiyaç halinde buraya Interceptor'lar (Token ekleme, hata yakalama vb.) eklenebilir.
+axiosInstance.interceptors.response.use(
+    (response) => response,
     (error) => {
-        console.error('API Error:', error.response?.data || error.message);
+        console.error('API Error:', error.response?.data?.message || error.message);
         return Promise.reject(error);
     }
 );

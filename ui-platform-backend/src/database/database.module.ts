@@ -1,29 +1,10 @@
-import { Global, Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Pool } from 'pg';
+import { Module, Global } from '@nestjs/common';
+import { databaseProvider } from './database.provider';
+import { SeedService } from './seed.service';
 
-// Bu sabiti repository dosyalarımızda @Inject(PG_CONNECTION) ile kullanacağız
-export const PG_CONNECTION = 'PG_CONNECTION';
-
-@Global() // Modülü global yapar, böylece her modülde tek tek import etmemize gerek kalmaz
+@Global()
 @Module({
-  providers: [
-    {
-      provide: PG_CONNECTION,
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const pool = new Pool({
-          host: configService.get<string>('DB_HOST'),
-          port: configService.get<number>('DB_PORT'),
-          user: configService.get<string>('DB_USER'),
-          password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DB_NAME'),
-        });
-
-        return pool;
-      },
-    },
-  ],
-  exports: [PG_CONNECTION], // Havuzu dışarı açıyoruz
+  providers: [databaseProvider, SeedService],
+  exports: [databaseProvider], // Diğer modüllerin DATABASE_POOL'a erişmesi için şart
 })
 export class DatabaseModule {}

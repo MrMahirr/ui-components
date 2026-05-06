@@ -26,12 +26,18 @@ importers:
       react-dom:
         specifier: ^19.2.5
         version: 19.2.5(react@19.2.5)
+      react-hot-toast:
+        specifier: ^2.6.0
+        version: 2.6.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react-router-dom:
         specifier: ^7.15.0
         version: 7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       shiki:
         specifier: ^4.0.2
         version: 4.0.2
+      sweetalert2:
+        specifier: ^11.26.24
+        version: 11.26.24
       tailwind-merge:
         specifier: ^3.5.0
         version: 3.5.0
@@ -878,6 +884,11 @@ packages:
     resolution: {integrity: sha512-sepffkT8stwnIYbsMBpoCHJuJM5l98FUF2AnE07hfvE0m/qp3R586hw4jF4uadbhvg1ooIdzuu7CsfD2jzCaNA==}
     engines: {node: '>=18'}
 
+  goober@2.1.18:
+    resolution: {integrity: sha512-2vFqsaDVIT9Gz7N6kAL++pLpp41l3PfDuusHcjnGLfR6+huZkl6ziX+zgVC3ZxpqWhzH6pyDdGrCeDhMIvwaxw==}
+    peerDependencies:
+      csstype: ^3.0.10
+
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
@@ -1195,6 +1206,13 @@ packages:
     peerDependencies:
       react: ^19.2.5
 
+  react-hot-toast@2.6.0:
+    resolution: {integrity: sha512-bH+2EBMZ4sdyou/DPrfgIouFpcRLCJ+HoCA32UoAYHn6T3Ur5yfcDCeSr5mwldl6pFOsiocmrXMuoCJ1vV8bWg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+
   react-router-dom@7.15.0:
     resolution: {integrity: sha512-VcrVg64Fo8nwBvDscajG8gRTLIuTC6N50nb22l2HOOV4PTOHgoGp8mUjy9wLiHYoYTSYI36tUnXZgasSRFZorQ==}
     engines: {node: '>=20.0.0'}
@@ -1274,6 +1292,9 @@ packages:
   supports-color@10.2.2:
     resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
     engines: {node: '>=18'}
+
+  sweetalert2@11.26.24:
+    resolution: {integrity: sha512-SLgukW4wicewpW5VOukSXY5Z6DL/z7HCOK2ODSjmQPiSphCN8gJAmh9npoceXOtBRNoDN0xIz+zHYthtfiHmjg==}
 
   tailwind-merge@3.5.0:
     resolution: {integrity: sha512-I8K9wewnVDkL1NTGoqWmVEIlUcB9gFriAEkXkfCjX5ib8ezGxtR3xD7iZIxrfArjEsH7F1CHD4RFUtxefdqV/A==}
@@ -2257,6 +2278,10 @@ snapshots:
 
   globals@17.6.0: {}
 
+  goober@2.1.18(csstype@3.2.3):
+    dependencies:
+      csstype: 3.2.3
+
   gopd@1.2.0: {}
 
   graceful-fs@4.2.11: {}
@@ -2539,6 +2564,13 @@ snapshots:
       react: 19.2.5
       scheduler: 0.27.0
 
+  react-hot-toast@2.6.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+    dependencies:
+      csstype: 3.2.3
+      goober: 2.1.18(csstype@3.2.3)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+
   react-router-dom@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
       react: 19.2.5
@@ -2623,6 +2655,8 @@ snapshots:
       character-entities-legacy: 3.0.0
 
   supports-color@10.2.2: {}
+
+  sweetalert2@11.26.24: {}
 
   tailwind-merge@3.5.0: {}
 

@@ -1,9 +1,27 @@
 @import "tailwindcss";
 
-/* Eğer özel bir tema ayarı, renk veya font eklemek istersen v4'te bunu doğrudan CSS içinde yapıyoruz: */
 @theme {
-    --color-brand-500: #3b82f6;
-    /* Örnek kozmik tema renkleri */
-    --color-cosmic-dark: #0f172a;
-    --color-cosmic-neon: #06b6d4;
+    /* Default (Dark) Variables */
+    --color-background: #05050A;
+    --color-surface: rgba(255, 255, 255, 0.03);
+    --color-border: rgba(255, 255, 255, 0.06);
+    --color-text-main: #FAFAFA;
+    --color-text-muted: #8F9BA8;
+    --color-primary: #00D2FF;
+}
+
+/* Light Mode Overrides */
+.light {
+    --color-background: #F8FAFC;
+    --color-surface: rgba(255, 255, 255, 0.8);
+    --color-border: rgba(0, 0, 0, 0.08);
+    --color-text-main: #0F172A;
+    --color-text-muted: #64748B;
+    --color-primary: #0EA5E9;
+}
+
+@layer base {
+    body {
+        @apply bg-background text-text-main transition-colors duration-500 ease-in-out;
+    }
 }

@@ -4,14 +4,39 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ba58144-ecf4-4029-a55f-515b5f3c2d6b" name="Changes" comment="feat: backend components ve database kısmı tamamlandı.">
-      <change afterPath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui-platform-backend/src/database/database.module.ts" afterDir="false" />
+    <list default="true" id="5ba58144-ecf4-4029-a55f-515b5f3c2d6b" name="Changes" comment="dev ilk">
+      <change afterPath="$PROJECT_DIR$/ui-platform-backend/src/database/database.provider.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-backend/src/database/seed-data.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-backend/src/database/seed.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/components/layout/Navbar.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/components/layout/Sidebar.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/components/ui/ThemeSwitcher.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/config/ThemeContext.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/CodeExporter.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/configurator/ComponentConfigurator.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/configurator/InputControls.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/editor/ComponentEditor.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/CodeViewer.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/ComponentPlayground.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/SandboxIframe.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/hooks/useComponents.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/pages/Studio.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/store/useComponentStore.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/types/component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui-platform-frontend/src/utils/dummy.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-platform-backend/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-backend/src/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-backend/src/app.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-backend/src/components/components.controller.spec.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ui-platform-backend/src/components/components.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-backend/src/components/components.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-platform-backend/src/components/components.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-backend/src/components/components.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-platform-backend/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-backend/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-backend/src/components/components.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-backend/src/database/database.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-backend/src/database/database.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/App.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/api/axios.instance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/api/axios.instance.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/api/endpoints.enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/api/endpoints.enum.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/main.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/styles/global.css" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/styles/global.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,12 +54,12 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "MrMahirr"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;MrMahirr&quot;
   }
-}]]></component>
+}</component>
   <component name="GitToolBoxStore">
     <option name="recentBranches">
       <RecentBranches>
@@ -44,12 +69,16 @@
               <option name="branches">
                 <list>
                   <RecentBranch>
-                    <option name="branchName" value="feature/backend-create" />
-                    <option name="lastUsedInstant" value="1778079701" />
+                    <option name="branchName" value="feature/frontend-create" />
+                    <option name="lastUsedInstant" value="1778082208" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="dev" />
-                    <option name="lastUsedInstant" value="1778079662" />
+                    <option name="lastUsedInstant" value="1778082136" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="feature/backend-create" />
+                    <option name="lastUsedInstant" value="1778079701" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="master" />
@@ -64,12 +93,12 @@
       </RecentBranches>
     </option>
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/MrMahirr/ui-components.git",
-    "accountId": "c7cf99bf-2ee3-47f5-9450-644a0b9afe49"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/MrMahirr/ui-components.git&quot;,
+    &quot;accountId&quot;: &quot;c7cf99bf-2ee3-47f5-9450-644a0b9afe49&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -93,7 +122,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "feature/backend-create",
+    "git-widget-placeholder": "feature/frontend-create",
     "ignore.virus.scanning.warn.message": "true",
     "javascript.preferred.runtime.type.id": "node",
     "junie.onboarding.icon.badge.shown": "true",
@@ -144,11 +173,30 @@
       <option name="project" value="LOCAL" />
       <updated>1778079446049</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="dev ilk">
+      <option name="closed" value="true" />
+      <created>1778082159626</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1778082159626</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -156,6 +204,7 @@
     </ignored-roots>
     <MESSAGE value="ilk commit" />
     <MESSAGE value="feat: backend components ve database kısmı tamamlandı." />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: backend components ve database kısmı tamamlandı." />
+    <MESSAGE value="dev ilk" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev ilk" />
   </component>
 </project>
