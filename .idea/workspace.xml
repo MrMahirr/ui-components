@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5ba58144-ecf4-4029-a55f-515b5f3c2d6b" name="Changes" comment="dev ilk">
-      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/features/configurator/ComponentConfigurator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/configurator/ComponentConfigurator.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/features/configurator/InputControls.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/configurator/InputControls.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/ComponentPlayground.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/ComponentPlayground.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/SandboxIframe.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/SandboxIframe.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/VariationGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/features/playground/VariationGrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/pages/Studio.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/pages/Studio.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui-platform-frontend/src/store/useComponentStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/ui-platform-frontend/src/store/useComponentStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

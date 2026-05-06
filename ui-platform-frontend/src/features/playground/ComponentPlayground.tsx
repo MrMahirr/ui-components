@@ -50,6 +50,15 @@ export function ComponentPlayground() {
         return htmlToJsx(resolvedHtml, compName, mode, globalStyles, selectedFont);
     };
 
+    // 2.5. Ham React Kodu Şablon Değişkeni İşleyici
+    const getProcessedReactCode = (reactCode: string) => {
+        let processed = reactCode;
+        Object.entries(currentConfig).forEach(([key, value]) => {
+            processed = processed.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), String(value));
+        });
+        return processed;
+    };
+
     // Akıllı HTML Çıktısı (Yarım Kalmış Yerleşim ve Efektleri Giydirme)
     const getProcessedHtml = (htmlCode: string | null) => {
         if (!htmlCode) return '';
@@ -149,7 +158,12 @@ export function ComponentPlayground() {
     };
 
     const getActiveCode = () => {
-        if (activeTab === 'react') return generateReactCode(activeComponent.raw_html, activeComponent.name, styleMode);
+        if (activeTab === 'react') {
+            if (activeComponent.raw_react) {
+                return getProcessedReactCode(activeComponent.raw_react);
+            }
+            return generateReactCode(activeComponent.raw_html, activeComponent.name, styleMode);
+        }
         if (activeTab === 'html') return getProcessedHtml(activeComponent.raw_html);
         if (activeTab === 'css') return generatePlainCss(activeComponent.name);
         return '';

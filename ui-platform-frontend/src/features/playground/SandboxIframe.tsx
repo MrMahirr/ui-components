@@ -36,6 +36,18 @@ export function SandboxIframe({
         // 2. Resolve source React code. If raw React is missing, parse raw HTML to JSX on-the-fly!
         const sourceReactCode = reactCode || htmlToJsx(html || '', componentClassName, 'tailwind');
 
+        // Extract the actual defined function or const name from reactCode if present, fallback to derived componentClassName
+        let actualComponentName = componentClassName;
+        if (reactCode) {
+            const funcMatch = reactCode.match(/(?:export\s+)?function\s+([a-zA-Z0-9_]+)\s*\(/);
+            const constMatch = reactCode.match(/(?:export\s+)?const\s+([a-zA-Z0-9_]+)\s*=\s*(?:\(|\w+)/);
+            if (funcMatch && funcMatch[1]) {
+                actualComponentName = funcMatch[1];
+            } else if (constMatch && constMatch[1]) {
+                actualComponentName = constMatch[1];
+            }
+        }
+
         // 3. Pre-process React code to strip ES Modules keywords so Babel UMD runs it cleanly
         let cleanReactCode = sourceReactCode
             // Strip ES6 import lines
@@ -45,6 +57,32 @@ export function SandboxIframe({
             .replace(/export\s+default\s+/g, '')
             .replace(/export\s+function\s+/g, 'function ')
             .replace(/export\s+const\s+/g, 'const ');
+
+        // 3.5. Convert static double curly templates to active React reactive props
+        // Ensure the main component function signature accepts 'props'
+        const functionRegex = new RegExp(`(function\\s+${actualComponentName}\\s*)\\(\\s*\\)`);
+        cleanReactCode = cleanReactCode.replace(functionRegex, '$1(props)');
+
+        const arrowRegex = new RegExp(`(const\\s+${actualComponentName}\\s*=\\s*)\\(\\s*\\)(\\s*=>)`);
+        cleanReactCode = cleanReactCode.replace(arrowRegex, '$1props$2');
+
+        // Dynamically replace config key templates first
+        Object.keys(config).forEach(key => {
+            const quotedRegex = new RegExp(`['"]{{\\s*${key}\\s*}}['"]`, 'g');
+            cleanReactCode = cleanReactCode.replace(quotedRegex, `props.${key}`);
+
+            const partialQuotedRegex = new RegExp(`(['"])([^'"><\\r\\n]*?){{\\s*${key}\\s*}}([^'"><\\r\\n]*?)(['"])`, 'g');
+            cleanReactCode = cleanReactCode.replace(partialQuotedRegex, '`$2\${props.' + key + '}$3`');
+
+            const jsxTextRegex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+            cleanReactCode = cleanReactCode.replace(jsxTextRegex, `{props.${key}}`);
+        });
+
+        // Global fallback replacements for any remaining placeholders to guarantee zero rendering errors
+        cleanReactCode = cleanReactCode
+            .replace(/['"]{{\s*([a-zA-Z0-9_-]+)\s*}}['"]/g, 'props.$1')
+            .replace(/(['"])([^'"><\r\n]*?){{\s*([a-zA-Z0-9_-]+)\s*}}([^'"><\r\n]*?)(['"])/g, '`$2${props.$3}$4`')
+            .replace(/{{\s*([a-zA-Z0-9_-]+)\s*}}/g, '{props.$1}');
 
         // 4. Generate CSS custom properties
         const cssVariables = Object.entries(config)
@@ -117,10 +155,18 @@ export function SandboxIframe({
                         margin: 0;
                         min-height: 100vh;
                         display: flex;
+                        flex-direction: column;
                         align-items: center;
-                        justify-content: center;
+                        justify-content: flex-start;
+                        padding: 2rem;
+                        box-sizing: border-box;
                         background-color: transparent;
                         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    }
+                    #component-preview-wrapper {
+                        width: 100%;
+                        max-width: 100%;
+                        box-sizing: border-box;
                     }
                     ${fontStyles}
                     ${compiledGlobalStyles}
@@ -180,7 +226,7 @@ export function SandboxIframe({
 
                         return (
                             <div id="component-preview-wrapper">
-                                <${componentClassName} {...props} />
+                                <${actualComponentName} {...props} />
                             </div>
                         );
                     };
