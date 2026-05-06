@@ -28,9 +28,9 @@ export function SandboxIframe({
     componentName
 }: SandboxIframeProps) {
     const srcDoc = useMemo(() => {
-        // 1. Resolve component name safely to match React standards
+        // 1. Resolve component name safely to match React standards (prepending Comp if it starts with a number)
         const componentClassName = componentName 
-            ? componentName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase())
+            ? componentName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()).replace(/^[0-9]/, (m) => `Comp${m}`)
             : 'MyComponent';
 
         // 2. Resolve source React code. If raw React is missing, parse raw HTML to JSX on-the-fly!
@@ -83,6 +83,16 @@ export function SandboxIframe({
             .replace(/['"]{{\s*([a-zA-Z0-9_-]+)\s*}}['"]/g, 'props.$1')
             .replace(/(['"])([^'"><\r\n]*?){{\s*([a-zA-Z0-9_-]+)\s*}}([^'"><\r\n]*?)(['"])/g, '`$2${props.$3}$4`')
             .replace(/{{\s*([a-zA-Z0-9_-]+)\s*}}/g, '{props.$1}');
+
+        // 3.6 Extract any custom style blocks from raw HTML to preserve backgrounds/custom styling in the React view
+        let htmlStyles = '';
+        if (html) {
+            const styleRegex = /<style>([\s\S]*?)<\/style>/gi;
+            let match;
+            while ((match = styleRegex.exec(html)) !== null) {
+                htmlStyles += match[1] + '\n';
+            }
+        }
 
         // 4. Generate CSS custom properties
         const cssVariables = Object.entries(config)
@@ -170,6 +180,7 @@ export function SandboxIframe({
                     }
                     ${fontStyles}
                     ${compiledGlobalStyles}
+                    ${htmlStyles}
                     
                     ::-webkit-scrollbar { width: 6px; height: 6px; }
                     ::-webkit-scrollbar-track { background: transparent; }

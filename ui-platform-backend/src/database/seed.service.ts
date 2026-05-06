@@ -8,6 +8,7 @@ export class SeedService implements OnApplicationBootstrap {
   constructor(@Inject('DATABASE_POOL') private readonly pool: Pool) {}
 
   async onApplicationBootstrap() {
+    // Force reload trigger: database automatic update
     await this.runSeed();
   }
 

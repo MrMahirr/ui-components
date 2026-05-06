@@ -228,7 +228,7 @@ export function htmlToJsx(
         ? `    <div className="ui-component-wrapper"${wrapperPropsStr}>\n${jsxOutput.join('\n')}\n    </div>`
         : jsxOutput.join('\n').replace(/^  /gm, ''); // Strip outer indentation offset if naked
 
-    const safeCompName = componentName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()) || 'MyComponent';
+    const safeCompName = componentName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()).replace(/^[0-9]/, (m) => `Comp${m}`) || 'MyComponent';
     const cssImport = mode === 'css' ? `import './${safeCompName}.css';\n\n` : '';
 
     return `import React from 'react';\n\n${cssImport}export function ${safeCompName}() {\n  return (\n${jsxBlock}\n  );\n}\n`;

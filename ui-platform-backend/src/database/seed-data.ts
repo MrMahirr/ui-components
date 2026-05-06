@@ -1342,8 +1342,8 @@ export function AuroraWaveGlow() {
     raw_html: `
       <div class="relative w-full h-80 bg-black overflow-hidden rounded-3xl flex items-center justify-center font-mono">
         <div class="absolute inset-0 pointer-events-none z-10"
-          style="background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05)); background-size: 100% 4px, 6px 100%; opacity: {{opacity}};"></div>
-        <span class="text-green-500 animate-pulse text-xs">> SIGNAL DETECTED: AUTO_OS_V1.3</span>
+          style="background: repeating-linear-gradient(rgba(18, 16, 16, 0) 0px, rgba(18, 16, 16, 0) 2px, rgba(0, 0, 0, 0.7) 2px, rgba(0, 0, 0, 0.7) 4px), repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.15) 0px, rgba(255, 0, 0, 0.15) 2px, rgba(0, 255, 0, 0.1) 2px, rgba(0, 255, 0, 0.1) 4px, rgba(0, 0, 255, 0.15) 4px, rgba(0, 0, 255, 0.15) 6px); opacity: {{opacity}};"></div>
+        <span class="text-green-400 font-bold animate-pulse text-xs z-20">> SIGNAL DETECTED: AUTO_OS_V1.3</span>
       </div>
     `,
     raw_react: `import React from 'react';
@@ -1354,16 +1354,15 @@ export function CRTScanlineRetroOverlay() {
       <div 
         className="absolute inset-0 pointer-events-none z-10"
         style={{
-          background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05))',
-          backgroundSize: '100% 4px, 6px 100%',
+          background: 'repeating-linear-gradient(rgba(18, 16, 16, 0) 0px, rgba(18, 16, 16, 0) 2px, rgba(0, 0, 0, 0.7) 2px, rgba(0, 0, 0, 0.7) 4px), repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.15) 0px, rgba(255, 0, 0, 0.15) 2px, rgba(0, 255, 0, 0.1) 2px, rgba(0, 255, 0, 0.1) 4px, rgba(0, 0, 255, 0.15) 4px, rgba(0, 0, 255, 0.15) 6px)',
           opacity: '{{opacity}}'
         }}
       ></div>
-      <span className="text-green-500 animate-pulse text-xs">&gt; SIGNAL DETECTED: AUTO_OS_V1.3</span>
+      <span className="text-green-400 font-bold animate-pulse text-xs z-20">&gt; SIGNAL DETECTED: AUTO_OS_V1.3</span>
     </div>
   );
 }`,
-    default_config: { opacity: 0.5 },
+    default_config: { opacity: 0.9 },
   },
   {
     name: 'Matrix Digital Code Cascade',

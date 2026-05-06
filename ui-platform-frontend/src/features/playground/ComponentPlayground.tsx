@@ -112,7 +112,7 @@ export function ComponentPlayground() {
             baseCss = getProcessedCode(activeComponent.raw_css, 'css');
         } else {
             const safeClass = activeComponent.slug || 'ui-component';
-            const safeCompName = compName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()) || 'MyComponent';
+            const safeCompName = compName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()).replace(/^[0-9]/, (m) => `Comp${m}`) || 'MyComponent';
             baseCss = `/* ${safeCompName}.css */\n\n.${safeClass} {\n  /* Stil kurallarınızı buraya yazın */\n  display: flex;\n}\n`;
         }
 
