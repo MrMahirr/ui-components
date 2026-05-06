@@ -1,10 +1,12 @@
 import {useState} from 'react';
-import {Code2, MonitorPlay, FileCode2, Paintbrush, Smartphone, Tablet, Monitor} from 'lucide-react';
+import {Code2, MonitorPlay, FileCode2, Paintbrush, Smartphone, Tablet, Monitor, Grid} from 'lucide-react';
 import {cn} from '../../utils/cn';
 import {useComponentStore} from '../../store/useComponentStore';
 import {CodeViewer} from './CodeViewer';
 import {SandboxIframe} from './SandboxIframe';
+import {VariationGrid} from './VariationGrid';
 import type {UIComponent} from '../../types/component';
+import {htmlToJsx} from '../../utils/html-to-jsx';
 
 // UIComponent tipini genişleterek raw_css desteği ekliyoruz (TS2339 hatası için)
 interface ExtendedUIComponent extends UIComponent {
@@ -12,13 +14,15 @@ interface ExtendedUIComponent extends UIComponent {
 }
 
 export function ComponentPlayground() {
-    const [activeTab, setActiveTab] = useState<'preview' | 'react' | 'html' | 'css'>('preview');
+    const [activeTab, setActiveTab] = useState<'preview' | 'variations' | 'react' | 'html' | 'css'>('preview');
     const [styleMode, setStyleMode] = useState<'tailwind' | 'css'>('tailwind');
     const [viewport, setViewport] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
-    const {activeComponent, currentConfig} = useComponentStore() as {
+    const {activeComponent, currentConfig, selectedFont, globalStyles} = useComponentStore() as {
         activeComponent: ExtendedUIComponent | null,
-        currentConfig: Record<string, string | number | boolean>
+        currentConfig: Record<string, string | number | boolean>,
+        selectedFont: string,
+        globalStyles: any
     };
 
     if (!activeComponent) return null;
@@ -39,44 +43,140 @@ export function ComponentPlayground() {
         return processed;
     };
 
-    // 2. Akıllı HTML -> React Çevirici (Regex düzeltildi - TS hatası için)
+    // 2. Akıllı HTML -> React Çevirici (Yüksek Doğruluklu AST Derleyicisi ile)
     const generateReactCode = (htmlCode: string | null, compName: string, mode: 'tailwind' | 'css') => {
         if (!htmlCode) return '';
-        let jsx = getProcessedCode(htmlCode, mode);
+        const resolvedHtml = getProcessedCode(htmlCode, mode);
+        return htmlToJsx(resolvedHtml, compName, mode, globalStyles, selectedFont);
+    };
 
-        jsx = jsx.replace(/class=/g, 'className=').replace(/for=/g, 'htmlFor=').replace(/tabindex=/g, 'tabIndex=');
-        // Unnecessary escape hatası için regex düzeltildi
-        jsx = jsx.replace(/<(img|input|br|hr)([^>]*[^/])>/g, '<$1$2 />');
+    // 2.5. Ham React Kodu Şablon Değişkeni İşleyici
+    const getProcessedReactCode = (reactCode: string) => {
+        let processed = reactCode;
+        Object.entries(currentConfig).forEach(([key, value]) => {
+            processed = processed.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), String(value));
+        });
+        return processed;
+    };
 
-        const safeCompName = compName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()) || 'MyComponent';
-        const cssImport = mode === 'css' ? `import './${safeCompName}.css';\n\n` : '';
+    // Akıllı HTML Çıktısı (Yarım Kalmış Yerleşim ve Efektleri Giydirme)
+    const getProcessedHtml = (htmlCode: string | null) => {
+        if (!htmlCode) return '';
+        const processed = getProcessedCode(htmlCode, styleMode);
+        
+        if (globalStyles) {
+            const rules: string[] = [];
+            rules.push(`padding: ${globalStyles.paddingY}px ${globalStyles.paddingX}px;`);
+            if (globalStyles.borderWidth > 0) {
+                rules.push(`border: ${globalStyles.borderWidth}px solid ${globalStyles.borderColor};`);
+            }
+            if (globalStyles.borderRadius && globalStyles.borderRadius !== '0px') {
+                rules.push(`border-radius: ${globalStyles.borderRadius};`);
+            }
+            if (globalStyles.opacity !== 100) {
+                rules.push(`opacity: ${globalStyles.opacity / 100};`);
+            }
+            if (globalStyles.fontSize && globalStyles.fontSize !== 14) {
+                rules.push(`font-size: ${globalStyles.fontSize}px;`);
+            }
+            if (globalStyles.fontWeight && globalStyles.fontWeight !== '400') {
+                rules.push(`font-weight: ${globalStyles.fontWeight};`);
+            }
+            if (globalStyles.letterSpacing && globalStyles.letterSpacing !== 'normal') {
+                const spacingValue = 
+                    globalStyles.letterSpacing === 'tighter' ? '-0.05em' :
+                    globalStyles.letterSpacing === 'tight' ? '-0.025em' :
+                    globalStyles.letterSpacing === 'wide' ? '0.025em' :
+                    globalStyles.letterSpacing === 'wider' ? '0.05em' :
+                    globalStyles.letterSpacing === 'widest' ? '0.1em' : '0em';
+                rules.push(`letter-spacing: ${spacingValue};`);
+            }
+            if (selectedFont && selectedFont !== 'Inter') {
+                rules.push(`font-family: '${selectedFont}', sans-serif;`);
+            }
+            if (globalStyles.glowBlur > 0) {
+                rules.push(`box-shadow: 0 0 ${globalStyles.glowBlur}px ${globalStyles.glowSpread}px ${globalStyles.glowColor};`);
+            }
 
-        return `import React from 'react';\n\n${cssImport}export function ${safeCompName}() {\n  return (\n    ${jsx.split('\n').join('\n    ')}\n  );\n}\n`;
+            if (rules.length > 0) {
+                return `<div class="ui-component-wrapper" style="${rules.join(' ')}">\n  ${processed.split('\n').join('\n  ')}\n</div>`;
+            }
+        }
+        return processed;
     };
 
     // 3. Düz CSS Çıktısı (Any kullanımı kaldırıldı)
     const generatePlainCss = (compName: string) => {
+        let baseCss = '';
         if (activeComponent.raw_css) {
-            return getProcessedCode(activeComponent.raw_css, 'css');
+            baseCss = getProcessedCode(activeComponent.raw_css, 'css');
+        } else {
+            const safeClass = activeComponent.slug || 'ui-component';
+            const safeCompName = compName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()).replace(/^[0-9]/, (m) => `Comp${m}`) || 'MyComponent';
+            baseCss = `/* ${safeCompName}.css */\n\n.${safeClass} {\n  /* Stil kurallarınızı buraya yazın */\n  display: flex;\n}\n`;
         }
-        const safeClass = activeComponent.slug || 'ui-component';
-        const safeCompName = compName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()) || 'MyComponent';
-        return `/* ${safeCompName}.css */\n\n.${safeClass} {\n  /* Stil kurallarınızı buraya yazın */\n  display: flex;\n}\n`;
+
+        if (globalStyles) {
+            const rules: string[] = [];
+            rules.push(`  padding: ${globalStyles.paddingY}px ${globalStyles.paddingX}px;`);
+            if (globalStyles.borderWidth > 0) {
+                rules.push(`  border: ${globalStyles.borderWidth}px solid ${globalStyles.borderColor};`);
+            }
+            if (globalStyles.borderRadius && globalStyles.borderRadius !== '0px') {
+                rules.push(`  border-radius: ${globalStyles.borderRadius};`);
+            }
+            if (globalStyles.opacity !== 100) {
+                rules.push(`  opacity: ${globalStyles.opacity / 100};`);
+            }
+            if (globalStyles.fontSize && globalStyles.fontSize !== 14) {
+                rules.push(`  font-size: ${globalStyles.fontSize}px;`);
+            }
+            if (globalStyles.fontWeight && globalStyles.fontWeight !== '400') {
+                rules.push(`  font-weight: ${globalStyles.fontWeight};`);
+            }
+            if (globalStyles.letterSpacing && globalStyles.letterSpacing !== 'normal') {
+                const spacingValue = 
+                    globalStyles.letterSpacing === 'tighter' ? '-0.05em' :
+                    globalStyles.letterSpacing === 'tight' ? '-0.025em' :
+                    globalStyles.letterSpacing === 'wide' ? '0.025em' :
+                    globalStyles.letterSpacing === 'wider' ? '0.05em' :
+                    globalStyles.letterSpacing === 'widest' ? '0.1em' : '0em';
+                rules.push(`  letter-spacing: ${spacingValue};`);
+            }
+            if (selectedFont && selectedFont !== 'Inter') {
+                rules.push(`  font-family: '${selectedFont}', sans-serif;`);
+            }
+            if (globalStyles.glowBlur > 0) {
+                rules.push(`  box-shadow: 0 0 ${globalStyles.glowBlur}px ${globalStyles.glowSpread}px ${globalStyles.glowColor};`);
+            }
+
+            if (rules.length > 0) {
+                baseCss += `\n/* Global Customizer Wrapper Styles */\n.ui-component-wrapper {\n${rules.join('\n')}\n}\n`;
+            }
+        }
+        return baseCss;
     };
 
     const getActiveCode = () => {
-        if (activeTab === 'react') return activeComponent.raw_react ? getProcessedCode(activeComponent.raw_react, styleMode) : generateReactCode(activeComponent.raw_html, activeComponent.name, styleMode);
-        if (activeTab === 'html') return getProcessedCode(activeComponent.raw_html, styleMode);
+        if (activeTab === 'react') {
+            if (activeComponent.raw_react) {
+                return getProcessedReactCode(activeComponent.raw_react);
+            }
+            return generateReactCode(activeComponent.raw_html, activeComponent.name, styleMode);
+        }
+        if (activeTab === 'html') return getProcessedHtml(activeComponent.raw_html);
         if (activeTab === 'css') return generatePlainCss(activeComponent.name);
         return '';
     };
 
     return (
         <div className="flex flex-col h-full w-full">
-            <div className="flex px-4 border-b border-border bg-surface/30 justify-between items-center z-10">
+            <div className="flex px-4 border-b border-border bg-surface/30 justify-between items-center z-10 select-none">
                 <div className="flex">
                     <TabButton active={activeTab === 'preview'} onClick={() => setActiveTab('preview')}
                                icon={<MonitorPlay size={16}/>} label="Preview"/>
+                    <TabButton active={activeTab === 'variations'} onClick={() => setActiveTab('variations')}
+                               icon={<Grid size={16}/>} label="Variations"/>
                     <TabButton active={activeTab === 'react'} onClick={() => setActiveTab('react')}
                                icon={<Code2 size={16}/>} label="React"/>
                     <TabButton active={activeTab === 'html'} onClick={() => setActiveTab('html')}
@@ -115,21 +215,32 @@ export function ComponentPlayground() {
                 </div>
             </div>
 
-            <div className="flex-1 p-8 bg-background/10 relative overflow-hidden flex items-center justify-center">
+            <div className="flex-1 bg-background/10 relative overflow-hidden flex items-center justify-center">
                 {activeTab === 'preview' ? (
-                    <div className="relative group w-full h-full flex items-center justify-center overflow-auto">
+                    <div className="relative group w-full h-full p-8 flex items-center justify-center overflow-auto">
                         <div
                             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 blur-[100px] rounded-full transition-all duration-500 pointer-events-none"/>
                         <div
                             className={cn("relative transition-all duration-500 ease-out bg-transparent", viewport === 'tablet' ? "w-[768px] h-[1024px] border-[8px] border-surface-hover rounded-[2rem] shadow-2xl overflow-hidden" : viewport === 'mobile' ? "w-[375px] h-[812px] border-[12px] border-surface-hover rounded-[2.5rem] shadow-2xl overflow-hidden" : "w-full h-full")}>
-                            <SandboxIframe html={activeComponent.raw_html} config={currentConfig}/>
+                            <SandboxIframe 
+                                html={activeComponent.raw_html} 
+                                config={currentConfig} 
+                                fontFamily={selectedFont} 
+                                globalStyles={globalStyles}
+                                reactCode={activeComponent.raw_react}
+                                componentName={activeComponent.name}
+                            />
                         </div>
                     </div>
+                ) : activeTab === 'variations' ? (
+                    <VariationGrid />
                 ) : (
-                    <CodeViewer
-                        code={getActiveCode()}
-                        language={(activeTab === 'css' ? 'css' : activeTab === 'react' ? 'react' : 'html') as any}
-                    />
+                    <div className="w-full h-full p-8 flex items-center justify-center">
+                        <CodeViewer
+                            code={getActiveCode()}
+                            language={(activeTab === 'css' ? 'css' : activeTab === 'react' ? 'react' : 'html') as any}
+                        />
+                    </div>
                 )}
             </div>
         </div>

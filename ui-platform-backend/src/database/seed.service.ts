@@ -8,6 +8,7 @@ export class SeedService implements OnApplicationBootstrap {
   constructor(@Inject('DATABASE_POOL') private readonly pool: Pool) {}
 
   async onApplicationBootstrap() {
+    // Force reload trigger: database automatic update
     await this.runSeed();
   }
 
@@ -29,26 +30,30 @@ export class SeedService implements OnApplicationBootstrap {
         );
       `);
 
-      const { rows } = await client.query('SELECT COUNT(*) FROM components');
-      if (parseInt(rows[0].count) === 0) {
-        console.log('🌱 Seed işlemi başlatılıyor...');
-        const components = INITIAL_COMPONENTS as Partial<ComponentEntity>[];
+      console.log('🌱 Seed işlemi başlatılıyor...');
+      const components = INITIAL_COMPONENTS as Partial<ComponentEntity>[];
 
-        for (const comp of components) {
-          await client.query(
-            'INSERT INTO components (name, category, slug, raw_react, raw_html, default_config) VALUES ($1, $2, $3, $4, $5, $6)',
-            [
-              comp.name,
-              comp.category,
-              comp.slug,
-              comp.raw_react,
-              comp.raw_html,
-              JSON.stringify(comp.default_config),
-            ],
-          );
-        }
-        console.log('✅ Veritabanı başarıyla dolduruldu.');
+      for (const comp of components) {
+        await client.query(
+          `INSERT INTO components (name, category, slug, raw_react, raw_html, default_config) 
+           VALUES ($1, $2, $3, $4, $5, $6)
+           ON CONFLICT (slug) DO UPDATE SET 
+             name = EXCLUDED.name,
+             category = EXCLUDED.category,
+             raw_react = EXCLUDED.raw_react,
+             raw_html = EXCLUDED.raw_html,
+             default_config = EXCLUDED.default_config`,
+          [
+            comp.name,
+            comp.category,
+            comp.slug,
+            comp.raw_react,
+            comp.raw_html,
+            JSON.stringify(comp.default_config),
+          ],
+        );
       }
+      console.log('✅ Veritabanı başarıyla dolduruldu.');
     } catch (err) {
       console.error('❌ Seed Hatası:', err);
     } finally {
