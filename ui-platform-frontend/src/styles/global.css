@@ -2,8 +2,8 @@
 
 /* Eğer özel bir tema ayarı, renk veya font eklemek istersen v4'te bunu doğrudan CSS içinde yapıyoruz: */
 @theme {
-  --color-brand-500: #3b82f6;
-  /* Örnek kozmik tema renkleri */
-  --color-cosmic-dark: #0f172a;
-  --color-cosmic-neon: #06b6d4;
+    --color-brand-500: #3b82f6;
+    /* Örnek kozmik tema renkleri */
+    --color-cosmic-dark: #0f172a;
+    --color-cosmic-neon: #06b6d4;
 }
