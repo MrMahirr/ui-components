@@ -13,7 +13,8 @@ export class ComponentsRepository {
     const result = await this.pool.query(
       'SELECT * FROM components ORDER BY created_at DESC',
     );
-    return result.rows;
+    // ESLint Fix: Dönen any[] verisini ComponentEntity[] olarak cast ediyoruz
+    return result.rows as ComponentEntity[];
   }
 
   async findById(id: number): Promise<ComponentEntity | null> {
@@ -21,7 +22,8 @@ export class ComponentsRepository {
       'SELECT * FROM components WHERE id = $1',
       [id],
     );
-    return result.rows[0] || null;
+    // ESLint Fix: Dönen any verisini ComponentEntity olarak cast ediyoruz
+    return (result.rows[0] as ComponentEntity) || null;
   }
 
   async findBySlug(slug: string): Promise<ComponentEntity | null> {
@@ -29,7 +31,7 @@ export class ComponentsRepository {
       'SELECT * FROM components WHERE slug = $1',
       [slug],
     );
-    return result.rows[0] || null;
+    return (result.rows[0] as ComponentEntity) || null;
   }
 
   async create(
@@ -39,7 +41,7 @@ export class ComponentsRepository {
     const query = `
       INSERT INTO components (name, category, slug, raw_react, raw_html, default_config)
       VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *;
+        RETURNING *;
     `;
     const values = [
       data.name,
@@ -51,16 +53,16 @@ export class ComponentsRepository {
     ];
 
     const result = await this.pool.query(query, values);
-    return result.rows[0];
+    return result.rows[0] as ComponentEntity;
   }
 
   async update(
     id: number,
     data: UpdateComponentDto,
   ): Promise<ComponentEntity | null> {
-    // Sadece gönderilen alanları dinamik olarak güncelleyen Raw SQL oluşturucu
-    const fields = [];
-    const values = [];
+    // TS2345 Fix: never[] hatasını önlemek için tipleri açıkça belirtiyoruz
+    const fields: string[] = [];
+    const values: any[] = [];
     let queryIndex = 1;
 
     for (const [key, value] of Object.entries(data)) {
@@ -74,17 +76,17 @@ export class ComponentsRepository {
     if (fields.length === 0) return this.findById(id);
 
     fields.push(`updated_at = CURRENT_TIMESTAMP`);
-    values.push(id); // ID her zaman son parametre
+    values.push(id);
 
     const query = `
-      UPDATE components 
-      SET ${fields.join(', ')} 
-      WHERE id = $${queryIndex} 
-      RETURNING *;
+      UPDATE components
+      SET ${fields.join(', ')}
+      WHERE id = $${queryIndex}
+        RETURNING *;
     `;
 
     const result = await this.pool.query(query, values);
-    return result.rows[0] || null;
+    return (result.rows[0] as ComponentEntity) || null;
   }
 
   async remove(id: number): Promise<boolean> {
