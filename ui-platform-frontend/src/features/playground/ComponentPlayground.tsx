@@ -1,9 +1,10 @@
 import {useState} from 'react';
-import {Code2, MonitorPlay, FileCode2, Paintbrush, Smartphone, Tablet, Monitor} from 'lucide-react';
+import {Code2, MonitorPlay, FileCode2, Paintbrush, Smartphone, Tablet, Monitor, Grid} from 'lucide-react';
 import {cn} from '../../utils/cn';
 import {useComponentStore} from '../../store/useComponentStore';
 import {CodeViewer} from './CodeViewer';
 import {SandboxIframe} from './SandboxIframe';
+import {VariationGrid} from './VariationGrid';
 import type {UIComponent} from '../../types/component';
 
 // UIComponent tipini genişleterek raw_css desteği ekliyoruz (TS2339 hatası için)
@@ -12,13 +13,14 @@ interface ExtendedUIComponent extends UIComponent {
 }
 
 export function ComponentPlayground() {
-    const [activeTab, setActiveTab] = useState<'preview' | 'react' | 'html' | 'css'>('preview');
+    const [activeTab, setActiveTab] = useState<'preview' | 'variations' | 'react' | 'html' | 'css'>('preview');
     const [styleMode, setStyleMode] = useState<'tailwind' | 'css'>('tailwind');
     const [viewport, setViewport] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
-    const {activeComponent, currentConfig} = useComponentStore() as {
+    const {activeComponent, currentConfig, selectedFont} = useComponentStore() as {
         activeComponent: ExtendedUIComponent | null,
-        currentConfig: Record<string, string | number | boolean>
+        currentConfig: Record<string, string | number | boolean>,
+        selectedFont: string
     };
 
     if (!activeComponent) return null;
@@ -73,10 +75,12 @@ export function ComponentPlayground() {
 
     return (
         <div className="flex flex-col h-full w-full">
-            <div className="flex px-4 border-b border-border bg-surface/30 justify-between items-center z-10">
+            <div className="flex px-4 border-b border-border bg-surface/30 justify-between items-center z-10 select-none">
                 <div className="flex">
                     <TabButton active={activeTab === 'preview'} onClick={() => setActiveTab('preview')}
                                icon={<MonitorPlay size={16}/>} label="Preview"/>
+                    <TabButton active={activeTab === 'variations'} onClick={() => setActiveTab('variations')}
+                               icon={<Grid size={16}/>} label="Variations"/>
                     <TabButton active={activeTab === 'react'} onClick={() => setActiveTab('react')}
                                icon={<Code2 size={16}/>} label="React"/>
                     <TabButton active={activeTab === 'html'} onClick={() => setActiveTab('html')}
@@ -115,21 +119,25 @@ export function ComponentPlayground() {
                 </div>
             </div>
 
-            <div className="flex-1 p-8 bg-background/10 relative overflow-hidden flex items-center justify-center">
+            <div className="flex-1 bg-background/10 relative overflow-hidden flex items-center justify-center">
                 {activeTab === 'preview' ? (
-                    <div className="relative group w-full h-full flex items-center justify-center overflow-auto">
+                    <div className="relative group w-full h-full p-8 flex items-center justify-center overflow-auto">
                         <div
                             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 blur-[100px] rounded-full transition-all duration-500 pointer-events-none"/>
                         <div
                             className={cn("relative transition-all duration-500 ease-out bg-transparent", viewport === 'tablet' ? "w-[768px] h-[1024px] border-[8px] border-surface-hover rounded-[2rem] shadow-2xl overflow-hidden" : viewport === 'mobile' ? "w-[375px] h-[812px] border-[12px] border-surface-hover rounded-[2.5rem] shadow-2xl overflow-hidden" : "w-full h-full")}>
-                            <SandboxIframe html={activeComponent.raw_html} config={currentConfig}/>
+                            <SandboxIframe html={activeComponent.raw_html} config={currentConfig} fontFamily={selectedFont}/>
                         </div>
                     </div>
+                ) : activeTab === 'variations' ? (
+                    <VariationGrid />
                 ) : (
-                    <CodeViewer
-                        code={getActiveCode()}
-                        language={(activeTab === 'css' ? 'css' : activeTab === 'react' ? 'react' : 'html') as any}
-                    />
+                    <div className="w-full h-full p-8 flex items-center justify-center">
+                        <CodeViewer
+                            code={getActiveCode()}
+                            language={(activeTab === 'css' ? 'css' : activeTab === 'react' ? 'react' : 'html') as any}
+                        />
+                    </div>
                 )}
             </div>
         </div>
