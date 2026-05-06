@@ -11,6 +11,7 @@ import type {UIComponent} from '../types/component';
 import {useSearchShortcut} from '../hooks/useSearchShortcut';
 import {SearchModal} from '../features/search/SearchModal';
 import {useAlert} from '../hooks/useAlert';
+import {Skeleton} from '../components/ui/Skeleton';
 
 export function Studio() {
     // --- Register keyboard shortcuts for search (Ctrl + K) ---
@@ -105,9 +106,31 @@ export function Studio() {
                                 }}
                             />
                         ) : isLoading && selectedSlug ? (
-                            <div
-                                className="flex items-center justify-center h-full opacity-50 tracking-widest text-[10px] uppercase font-bold text-primary animate-pulse">
-                                Yükleniyor...
+                            <div className="flex-1 flex flex-col h-full w-full">
+                                {/* Header Tabs Skeleton */}
+                                <div className="flex px-6 py-4 border-b border-border bg-surface/30 justify-between items-center select-none">
+                                    <div className="flex gap-4">
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-16" />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Skeleton className="h-6 w-12" />
+                                        <Skeleton className="h-6 w-20" />
+                                    </div>
+                                </div>
+                                {/* Preview Body Skeleton */}
+                                <div className="flex-1 p-8 flex items-center justify-center bg-background/10">
+                                    <div className="relative w-full max-w-lg h-64 flex items-center justify-center">
+                                        {/* Background Pulse Glow */}
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/5 blur-[80px] rounded-full animate-pulse" />
+                                        {/* Center component mockup */}
+                                        <div className="flex flex-col items-center gap-4">
+                                            <Skeleton className="h-12 w-40 rounded-2xl" />
+                                            <Skeleton className="h-3 w-28 opacity-60" />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         ) : !selectedSlug ? (
                             <div
@@ -120,7 +143,7 @@ export function Studio() {
                     </main>
 
                     {/* ALT: Configurator & Actions */}
-                    {!isFormMode && selectedSlug && activeComponent && (
+                    {!isFormMode && selectedSlug && (activeComponent || isLoading) && (
                         <aside
                             className="h-72 rounded-3xl border border-border bg-surface/50 backdrop-blur-xl overflow-hidden shadow-lg flex flex-col">
                             {/* Toolbar */}
@@ -130,26 +153,52 @@ export function Studio() {
                                     Configuration & Actions
                                 </span>
                                 <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={handleEdit}
-                                        className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-all cursor-pointer"
-                                        title="Bileşeni Düzenle"
-                                    >
-                                        <Edit3 size={16}/>
-                                    </button>
-                                    <button
-                                        onClick={handleDelete}
-                                        className="p-2 hover:bg-red-500/10 text-red-500 rounded-lg transition-all cursor-pointer"
-                                        title="Bileşeni Sil"
-                                    >
-                                        <Trash2 size={16}/>
-                                    </button>
+                                    {isLoading ? (
+                                        <>
+                                            <Skeleton className="h-8 w-8" />
+                                            <Skeleton className="h-8 w-8" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                onClick={handleEdit}
+                                                className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-all cursor-pointer"
+                                                title="Bileşeni Düzenle"
+                                            >
+                                                <Edit3 size={16}/>
+                                            </button>
+                                            <button
+                                                onClick={handleDelete}
+                                                className="p-2 hover:bg-red-500/10 text-red-500 rounded-lg transition-all cursor-pointer"
+                                                title="Bileşeni Sil"
+                                            >
+                                                <Trash2 size={16}/>
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
                             {/* Ayarlar Listesi */}
                             <div className="flex-1 overflow-y-auto">
-                                <ComponentConfigurator/>
+                                {isLoading ? (
+                                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-3 w-24 opacity-60" />
+                                            <Skeleton className="h-10 w-full" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-3 w-20 opacity-60" />
+                                            <Skeleton className="h-10 w-full" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-3 w-28 opacity-60" />
+                                            <Skeleton className="h-10 w-full" />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <ComponentConfigurator/>
+                                )}
                             </div>
                         </aside>
                     )}

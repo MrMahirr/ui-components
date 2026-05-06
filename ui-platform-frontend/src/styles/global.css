@@ -8,6 +8,8 @@
     --color-text-main: #FAFAFA;
     --color-text-muted: #8F9BA8;
     --color-primary: #00D2FF;
+    --color-skeleton-bg: rgba(255, 255, 255, 0.08);
+    --color-skeleton-shimmer: rgba(255, 255, 255, 0.12);
 }
 
 /* Light Mode Overrides */
@@ -18,10 +20,18 @@
     --color-text-main: #0F172A;
     --color-text-muted: #64748B;
     --color-primary: #0EA5E9;
+    --color-skeleton-bg: rgba(0, 0, 0, 0.08);
+    --color-skeleton-shimmer: rgba(0, 0, 0, 0.12);
 }
 
 @layer base {
     body {
         @apply bg-background text-text-main transition-colors duration-500 ease-in-out;
+    }
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
     }
 }

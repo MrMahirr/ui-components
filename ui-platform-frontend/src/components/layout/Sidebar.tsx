@@ -1,6 +1,7 @@
 import { Plus } from 'lucide-react'; // Yeni ikonumuz
 import { useComponents } from '../../hooks/useComponents';
 import { cn } from '../../utils/cn';
+import { Skeleton } from '../ui/Skeleton';
 
 interface SidebarProps {
     onSelect: (slug: string) => void;
@@ -32,8 +33,16 @@ export function Sidebar({ onSelect, selectedSlug, onCreateNew, isCreating }: Sid
             </div>
 
             {isLoading ? (
-                <div className="flex-1 flex items-center justify-center">
-                    <span className="text-xs text-text-muted animate-pulse tracking-widest uppercase">Yükleniyor...</span>
+                <div className="p-6 space-y-4">
+                    <Skeleton className="h-3 w-24 mb-6 opacity-60" />
+                    <div className="space-y-2.5">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-11/12" />
+                        <Skeleton className="h-10 w-5/6" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-3/4" />
+                        <Skeleton className="h-10 w-11/12" />
+                    </div>
                 </div>
             ) : (
                 <nav className="p-4 space-y-1.5 mt-2">
