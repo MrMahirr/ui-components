@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: ui_platform_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123 # Burayı kendi şifrenle değiştir
+      POSTGRES_DB: ui_platform
+    ports:
+      - "4566:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Raw SQL yazacağın için veritabanı tablolarını görsel olarak yönetmek işini çok hızlandırır
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: ui_platform_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@uiplatform.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
+    name: ui_platform_pgdata # Verilerin konteyner silinse bile kaybolmaması için kalıcı volume
