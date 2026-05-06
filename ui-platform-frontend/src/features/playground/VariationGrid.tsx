@@ -6,7 +6,7 @@ import { useComponentStore } from '../../store/useComponentStore';
  * forcing distinct browser states (Default, Hover, Active, Disabled) simultaneously on the active component.
  */
 export function VariationGrid() {
-    const { activeComponent, currentConfig, selectedFont } = useComponentStore();
+    const { activeComponent, currentConfig, selectedFont, globalStyles } = useComponentStore();
 
     if (!activeComponent) return null;
 
@@ -45,6 +45,9 @@ export function VariationGrid() {
                                 config={currentConfig}
                                 forcedState={state.value}
                                 fontFamily={selectedFont}
+                                globalStyles={globalStyles}
+                                reactCode={activeComponent.raw_react}
+                                componentName={activeComponent.name}
                             />
                         </div>
                     </div>

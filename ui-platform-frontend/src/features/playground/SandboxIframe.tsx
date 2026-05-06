@@ -1,29 +1,52 @@
 import { useMemo } from 'react';
+import type { GlobalStylesState } from '../../store/useComponentStore';
+import { htmlToJsx } from '../../utils/html-to-jsx';
 
 interface SandboxIframeProps {
     html: string | null;
     config: Record<string, any>;
     forcedState?: 'hover' | 'active' | 'focus' | 'disabled';
     fontFamily?: string;
+    globalStyles?: GlobalStylesState;
+    reactCode?: string | null;
+    componentName?: string;
 }
 
 /**
- * Highly isolated Sandbox Iframe rendering environment.
- * Dynamically resolves HTML variables and custom CSS properties, loads external Google Fonts stylesheets,
- * and executes programmatical Tailwind class mappings to emulate pseudo hover/active/focus/disabled states.
+ * Advanced Live React Sandbox Iframe Runner.
+ * Loads React 18, React-DOM, and @babel/standalone dynamically in-browser.
+ * Uses an AST-preprocessor to strip ES6 imports and mount raw/compiled JSX components.
+ * Feeds Customizer variables to the component as React Props and synchronizes re-renders.
  */
-export function SandboxIframe({ html, config, forcedState, fontFamily }: SandboxIframeProps) {
+export function SandboxIframe({ 
+    html, 
+    config, 
+    forcedState, 
+    fontFamily, 
+    globalStyles,
+    reactCode,
+    componentName
+}: SandboxIframeProps) {
     const srcDoc = useMemo(() => {
-        if (!html) return '';
+        // 1. Resolve component name safely to match React standards
+        const componentClassName = componentName 
+            ? componentName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase())
+            : 'MyComponent';
 
-        // 1. Swap template variables ({{label}}, etc.)
-        let processedHtml = html;
-        Object.entries(config).forEach(([key, value]) => {
-            const regex = new RegExp(`{{${key}}}`, 'g');
-            processedHtml = processedHtml.replace(regex, String(value));
-        });
+        // 2. Resolve source React code. If raw React is missing, parse raw HTML to JSX on-the-fly!
+        const sourceReactCode = reactCode || htmlToJsx(html || '', componentClassName, 'tailwind');
 
-        // 2. Generate CSS custom properties
+        // 3. Pre-process React code to strip ES Modules keywords so Babel UMD runs it cleanly
+        let cleanReactCode = sourceReactCode
+            // Strip ES6 import lines
+            .replace(/import\s+[\s\S]*?\s+from\s+['"].*?['"];?/g, '')
+            .replace(/import\s+['"].*?['"];?/g, '')
+            // Strip exports to avoid scope runtime issues
+            .replace(/export\s+default\s+/g, '')
+            .replace(/export\s+function\s+/g, 'function ')
+            .replace(/export\s+const\s+/g, 'const ');
+
+        // 4. Generate CSS custom properties
         const cssVariables = Object.entries(config)
             .map(([key, value]) => {
                 const cssKey = `--${key.replace(/_/g, '-')}`;
@@ -40,8 +63,32 @@ export function SandboxIframe({ html, config, forcedState, fontFamily }: Sandbox
             : '';
 
         const fontStyles = fontFamily
-            ? `body, html { font-family: '${fontFamily}', ui-sans-serif, system-ui, -apple-system, sans-serif !important; }`
+            ? `body, html, #component-preview-wrapper { font-family: '${fontFamily}', ui-sans-serif, system-ui, -apple-system, sans-serif !important; }`
             : '';
+
+        // Generate custom CSS for layout preview wrapper (Figma adjustments)
+        const compiledGlobalStyles = globalStyles ? `
+            #component-preview-wrapper {
+                padding: ${globalStyles.paddingY}px ${globalStyles.paddingX}px;
+                border: ${globalStyles.borderWidth}px solid ${globalStyles.borderColor};
+                border-radius: ${globalStyles.borderRadius};
+                opacity: ${globalStyles.opacity / 100};
+                font-size: ${globalStyles.fontSize}px;
+                font-weight: ${globalStyles.fontWeight};
+                letter-spacing: ${
+                    globalStyles.letterSpacing === 'tighter' ? '-0.05em' :
+                    globalStyles.letterSpacing === 'tight' ? '-0.025em' :
+                    globalStyles.letterSpacing === 'wide' ? '0.025em' :
+                    globalStyles.letterSpacing === 'wider' ? '0.05em' :
+                    globalStyles.letterSpacing === 'widest' ? '0.1em' : '0em'
+                };
+                box-shadow: ${globalStyles.glowBlur > 0 ? `0 0 ${globalStyles.glowBlur}px ${globalStyles.glowSpread}px ${globalStyles.glowColor}` : 'none'};
+                transition: all 0.25s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        ` : '';
 
         return `
             <!DOCTYPE html>
@@ -50,6 +97,17 @@ export function SandboxIframe({ html, config, forcedState, fontFamily }: Sandbox
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <script src="https://cdn.tailwindcss.com"></script>
+                
+                <!-- React 18 & ReactDOM UMD Libraries -->
+                <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+                <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+                
+                <!-- Live Babel Standalone Compiler -->
+                <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
+                
+                <!-- Lucide Icons Web Integration -->
+                <script src="https://unpkg.com/lucide@latest"></script>
+
                 ${fontLink}
                 <style>
                     :root {
@@ -65,6 +123,7 @@ export function SandboxIframe({ html, config, forcedState, fontFamily }: Sandbox
                         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     }
                     ${fontStyles}
+                    ${compiledGlobalStyles}
                     
                     ::-webkit-scrollbar { width: 6px; height: 6px; }
                     ::-webkit-scrollbar-track { background: transparent; }
@@ -72,47 +131,68 @@ export function SandboxIframe({ html, config, forcedState, fontFamily }: Sandbox
                 </style>
             </head>
             <body>
-                ${processedHtml}
+                <div id="root" class="w-full flex items-center justify-center"></div>
 
-                <script>
-                    window.addEventListener('DOMContentLoaded', () => {
-                        const forcedState = '${forcedState || ''}';
-                        if (!forcedState) return;
+                <!-- Live React Mount script compiled on the fly -->
+                <script type="text/babel">
+                    // Destructure standard hooks from Global React namespace for seamless usage in custom code
+                    const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
-                        // Find all elements to emulate specific pseudo hover/active/focus/disabled styling rules
-                        document.querySelectorAll('*').forEach(el => {
-                            if (forcedState === 'hover') {
-                                const hoverClasses = Array.from(el.classList).filter(c => c.startsWith('hover:'));
-                                hoverClasses.forEach(c => {
-                                    el.classList.add(c.substring(6)); // strip 'hover:' prefix
-                                });
-                            }
-                            if (forcedState === 'active') {
-                                const activeClasses = Array.from(el.classList).filter(c => c.startsWith('active:'));
-                                activeClasses.forEach(c => {
-                                    el.classList.add(c.substring(7)); // strip 'active:' prefix
-                                });
-                            }
-                            if (forcedState === 'focus') {
-                                const focusClasses = Array.from(el.classList).filter(c => c.startsWith('focus:'));
-                                focusClasses.forEach(c => {
-                                    el.classList.add(c.substring(6)); // strip 'focus:' prefix
-                                });
-                            }
-                            if (forcedState === 'disabled') {
-                                el.setAttribute('disabled', 'true');
-                                const disabledClasses = Array.from(el.classList).filter(c => c.startsWith('disabled:'));
-                                disabledClasses.forEach(c => {
-                                    el.classList.add(c.substring(9)); // strip 'disabled:' prefix
-                                });
+                    // 1. Raw React component injection
+                    ${cleanReactCode}
+
+                    // 2. High-fidelity layout wrapper component
+                    const App = () => {
+                        // Trigger forced layout states (Hover, Active, Focus, Disabled) after mount
+                        useEffect(() => {
+                            const forcedState = '${forcedState || ''}';
+                            if (!forcedState) return;
+
+                            document.querySelectorAll('#component-preview-wrapper *').forEach(el => {
+                                if (forcedState === 'hover') {
+                                    const hoverClasses = Array.from(el.classList).filter(c => c.startsWith('hover:'));
+                                    hoverClasses.forEach(c => el.classList.add(c.substring(6)));
+                                }
+                                if (forcedState === 'active') {
+                                    const activeClasses = Array.from(el.classList).filter(c => c.startsWith('active:'));
+                                    activeClasses.forEach(c => el.classList.add(c.substring(7)));
+                                }
+                                if (forcedState === 'focus') {
+                                    const focusClasses = Array.from(el.classList).filter(c => c.startsWith('focus:'));
+                                    focusClasses.forEach(c => el.classList.add(c.substring(6)));
+                                }
+                                if (forcedState === 'disabled') {
+                                    el.setAttribute('disabled', 'true');
+                                    const disabledClasses = Array.from(el.classList).filter(c => c.startsWith('disabled:'));
+                                    disabledClasses.forEach(c => el.classList.add(c.substring(9)));
+                                }
+                            });
+                        }, []);
+
+                        // Load Lucide icons dynamically after render
+                        useEffect(() => {
+                            if (window.lucide) {
+                                window.lucide.createIcons();
                             }
                         });
-                    });
+
+                        const props = ${JSON.stringify(config)};
+
+                        return (
+                            <div id="component-preview-wrapper">
+                                <${componentClassName} {...props} />
+                            </div>
+                        );
+                    };
+
+                    // 3. Mount Application to container
+                    const root = ReactDOM.createRoot(document.getElementById('root'));
+                    root.render(<App />);
                 </script>
             </body>
             </html>
         `;
-    }, [html, config, forcedState, fontFamily]);
+    }, [html, config, forcedState, fontFamily, globalStyles, reactCode, componentName]);
 
     return (
         <iframe
