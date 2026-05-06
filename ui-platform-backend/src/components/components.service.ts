@@ -40,9 +40,9 @@ export class ComponentsService {
   }
 
   async create(createComponentDto: CreateComponentDto) {
-    const slug = this.generateSlug(createComponentDto.name);
+    // BURAYI GÜNCELLE: Boş gelme ihtimaline karşı fallback ekliyoruz
+    const slug = this.generateSlug(createComponentDto.name || 'default-slug');
 
-    // Aynı slug var mı kontrolü
     const existing = await this.repository.findBySlug(slug);
     if (existing) {
       throw new ConflictException(
