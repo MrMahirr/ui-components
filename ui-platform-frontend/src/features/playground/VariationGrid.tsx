@@ -48,6 +48,7 @@ export function VariationGrid() {
                                 globalStyles={globalStyles}
                                 reactCode={activeComponent.raw_react}
                                 componentName={activeComponent.name}
+                                category={activeComponent.category}
                             />
                         </div>
                     </div>

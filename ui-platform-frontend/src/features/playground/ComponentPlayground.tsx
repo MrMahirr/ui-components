@@ -1,10 +1,9 @@
 import {useState} from 'react';
-import {Code2, MonitorPlay, FileCode2, Paintbrush, Smartphone, Tablet, Monitor, Grid} from 'lucide-react';
+import {Code2, MonitorPlay, FileCode2, Paintbrush, Smartphone, Tablet, Monitor} from 'lucide-react';
 import {cn} from '../../utils/cn';
 import {useComponentStore, type GlobalStylesState} from '../../store/useComponentStore';
 import {CodeViewer} from './CodeViewer';
 import {SandboxIframe} from './SandboxIframe';
-import {VariationGrid} from './VariationGrid';
 import type {UIComponent} from '../../types/component';
 import {htmlToJsx} from '../../utils/html-to-jsx';
 
@@ -14,7 +13,7 @@ interface ExtendedUIComponent extends UIComponent {
 }
 
 export function ComponentPlayground() {
-    const [activeTab, setActiveTab] = useState<'preview' | 'variations' | 'react' | 'html' | 'css'>('preview');
+    const [activeTab, setActiveTab] = useState<'preview' | 'react' | 'html' | 'css'>('preview');
     const [styleMode, setStyleMode] = useState<'tailwind' | 'css'>('tailwind');
     const [viewport, setViewport] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
@@ -242,8 +241,6 @@ export function ComponentPlayground() {
                 <div className="flex">
                     <TabButton active={activeTab === 'preview'} onClick={() => setActiveTab('preview')}
                                icon={<MonitorPlay size={16}/>} label="Preview"/>
-                    <TabButton active={activeTab === 'variations'} onClick={() => setActiveTab('variations')}
-                               icon={<Grid size={16}/>} label="Variations"/>
                     <TabButton active={activeTab === 'react'} onClick={() => setActiveTab('react')}
                                icon={<Code2 size={16}/>} label="React"/>
                     <TabButton active={activeTab === 'html'} onClick={() => setActiveTab('html')}
@@ -296,11 +293,10 @@ export function ComponentPlayground() {
                                 globalStyles={globalStyles}
                                 reactCode={activeComponent.raw_react}
                                 componentName={activeComponent.name}
+                                category={activeComponent.category}
                             />
                         </div>
                     </div>
-                ) : activeTab === 'variations' ? (
-                    <VariationGrid />
                 ) : (
                     <div className="w-full h-full p-8 flex items-center justify-center">
                         <CodeViewer

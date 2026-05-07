@@ -10,6 +10,7 @@ interface SandboxIframeProps {
     globalStyles?: GlobalStylesState;
     reactCode?: string | null;
     componentName?: string;
+    category?: string;
 }
 
 /**
@@ -25,9 +26,12 @@ export function SandboxIframe({
     fontFamily, 
     globalStyles,
     reactCode,
-    componentName
+    componentName,
+    category
 }: SandboxIframeProps) {
     const srcDoc = useMemo(() => {
+        const isBackgroundComponent = category?.toLowerCase() === 'backgrounds';
+        
         // 1. Resolve component name safely to match React standards (prepending Comp if it starts with a number)
         const componentClassName = componentName 
             ? componentName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()).replace(/^[0-9]/, (m) => `Comp${m}`)
@@ -132,7 +136,8 @@ export function SandboxIframe({
                 };
                 box-shadow: ${globalStyles.glowBlur > 0 ? `0 0 ${globalStyles.glowBlur}px ${globalStyles.glowSpread}px ${globalStyles.glowColor}` : 'none'};
                 transition: all 0.25s ease;
-                display: inline-flex;
+                display: ${isBackgroundComponent ? 'flex' : 'inline-flex'};
+                width: ${isBackgroundComponent ? '100%' : 'auto'};
                 align-items: center;
                 justify-content: center;
             }
@@ -168,13 +173,14 @@ export function SandboxIframe({
                         flex-direction: column;
                         align-items: center;
                         justify-content: flex-start;
-                        padding: 2rem;
+                        padding: ${isBackgroundComponent ? '0' : '2rem'};
                         box-sizing: border-box;
                         background-color: transparent;
                         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     }
                     #component-preview-wrapper {
-                        display: inline-flex;
+                        display: ${isBackgroundComponent ? 'flex' : 'inline-flex'};
+                        width: ${isBackgroundComponent ? '100%' : 'auto'};
                         align-items: center;
                         justify-content: center;
                         max-width: 100%;
@@ -251,7 +257,7 @@ export function SandboxIframe({
             </body>
             </html>
         `;
-    }, [html, config, forcedState, fontFamily, globalStyles, reactCode, componentName]);
+    }, [html, config, forcedState, fontFamily, globalStyles, reactCode, componentName, category]);
 
     return (
         <iframe
