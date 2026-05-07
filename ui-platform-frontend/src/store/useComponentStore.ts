@@ -33,12 +33,12 @@ export const DEFAULT_GLOBAL_STYLES: GlobalStylesState = {
 
 interface ComponentState {
     activeComponent: UIComponent | null;
-    currentConfig: Record<string, any>;
+    currentConfig: Record<string, string | number | boolean>;
     selectedFont: string;
     globalStyles: GlobalStylesState;
     setActiveComponent: (comp: UIComponent) => void;
-    updateConfig: (key: string, value: any) => void;
-    updateGlobalStyle: (key: keyof GlobalStylesState, value: any) => void;
+    updateConfig: (key: string, value: string | number | boolean) => void;
+    updateGlobalStyle: (key: keyof GlobalStylesState, value: string | number) => void;
     resetConfig: () => void;
     setSelectedFont: (font: string) => void;
 }

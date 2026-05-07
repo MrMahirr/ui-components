@@ -28,6 +28,7 @@ export function SearchModal({ onSelect }: SearchModalProps) {
         if (isOpen) {
             // Slight delay ensures the DOM is fully rendered and ready to focus
             const timer = setTimeout(() => inputRef.current?.focus(), 50);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setSearchQuery('');
             setActiveIndex(0);
             return () => clearTimeout(timer);
@@ -36,6 +37,7 @@ export function SearchModal({ onSelect }: SearchModalProps) {
 
     // Keep active index clamped within bounds when search results change
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveIndex(0);
     }, [searchQuery]);
 

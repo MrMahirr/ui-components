@@ -226,7 +226,7 @@ export function htmlToJsx(
     // Embed children inside the styled container or render naked elements based on active styles
     const jsxBlock = wrapperPropsStr
         ? `    <div className="ui-component-wrapper"${wrapperPropsStr}>\n${jsxOutput.join('\n')}\n    </div>`
-        : jsxOutput.join('\n').replace(/^  /gm, ''); // Strip outer indentation offset if naked
+        : jsxOutput.join('\n').replace(/^ {2}/gm, ''); // Strip outer indentation offset if naked
 
     const safeCompName = componentName.replace(/[^a-zA-Z0-9]/g, '').replace(/^[a-z]/, (m) => m.toUpperCase()).replace(/^[0-9]/, (m) => `Comp${m}`) || 'MyComponent';
     const cssImport = mode === 'css' ? `import './${safeCompName}.css';\n\n` : '';

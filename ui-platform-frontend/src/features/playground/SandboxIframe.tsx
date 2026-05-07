@@ -4,7 +4,7 @@ import { htmlToJsx } from '../../utils/html-to-jsx';
 
 interface SandboxIframeProps {
     html: string | null;
-    config: Record<string, any>;
+    config: Record<string, string | number | boolean>;
     forcedState?: 'hover' | 'active' | 'focus' | 'disabled';
     fontFamily?: string;
     globalStyles?: GlobalStylesState;
@@ -72,7 +72,7 @@ export function SandboxIframe({
             cleanReactCode = cleanReactCode.replace(quotedRegex, `props.${key}`);
 
             const partialQuotedRegex = new RegExp(`(['"])([^'"><\\r\\n]*?){{\\s*${key}\\s*}}([^'"><\\r\\n]*?)(['"])`, 'g');
-            cleanReactCode = cleanReactCode.replace(partialQuotedRegex, '`$2\${props.' + key + '}$3`');
+            cleanReactCode = cleanReactCode.replace(partialQuotedRegex, '`$2${props.' + key + '}$3`');
 
             const jsxTextRegex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
             cleanReactCode = cleanReactCode.replace(jsxTextRegex, `{props.${key}}`);

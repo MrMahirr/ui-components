@@ -1,0 +1,57 @@
+services:
+  # --- Database Container ---
+  db:
+    image: postgres:16-alpine
+    container_name: component-manager-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: ui_platform
+    ports:
+      - "4566:5432" # Maps host port 4566 to container PostgreSQL, enabling seamless local dev connection
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ui_platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --- NestJS Backend Container ---
+  backend:
+    build:
+      context: ./ui-platform-backend
+      dockerfile: Dockerfile
+    container_name: component-manager-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432 # Uses standard container port within the bridge network
+      DB_USER: postgres
+      DB_PASSWORD: admin123
+      DB_NAME: ui_platform
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # --- Vite SPA Frontend Container ---
+  frontend:
+    build:
+      context: ./ui-platform-frontend
+      dockerfile: Dockerfile
+    container_name: component-manager-frontend
+    restart: always
+    ports:
+      - "80:80" # Standard HTTP web traffic
+    environment:
+      - VITE_API_URL=http://localhost:3000 # Production API address fallback
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+    driver: local

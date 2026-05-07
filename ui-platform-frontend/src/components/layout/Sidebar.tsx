@@ -42,6 +42,7 @@ export function Sidebar({ onSelect, selectedSlug, onCreateNew, isCreating }: Sid
         if (selectedSlug && components) {
             const activeComp = components.find(c => c.slug === selectedSlug);
             if (activeComp && activeComp.category) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setOpenCategories(prev => ({
                     ...prev,
                     [activeComp.category]: true

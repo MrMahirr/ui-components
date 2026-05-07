@@ -9,7 +9,7 @@ import 'prismjs/components/prism-json';
 import { cn } from '../../utils/cn';
 
 // Handle ESModule / CommonJS default import discrepancy in Vite
-const Editor = (SimpleCodeEditor as any).default || SimpleCodeEditor;
+const Editor = (SimpleCodeEditor as unknown as { default: typeof SimpleCodeEditor }).default || SimpleCodeEditor;
 
 interface CodeFieldProps {
     value: string;

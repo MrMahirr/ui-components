@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Code2, MonitorPlay, FileCode2, Paintbrush, Smartphone, Tablet, Monitor, Grid} from 'lucide-react';
 import {cn} from '../../utils/cn';
-import {useComponentStore} from '../../store/useComponentStore';
+import {useComponentStore, type GlobalStylesState} from '../../store/useComponentStore';
 import {CodeViewer} from './CodeViewer';
 import {SandboxIframe} from './SandboxIframe';
 import {VariationGrid} from './VariationGrid';
@@ -22,7 +22,7 @@ export function ComponentPlayground() {
         activeComponent: ExtendedUIComponent | null,
         currentConfig: Record<string, string | number | boolean>,
         selectedFont: string,
-        globalStyles: any
+        globalStyles: GlobalStylesState
     };
 
     if (!activeComponent) return null;
@@ -174,7 +174,7 @@ export function ComponentPlayground() {
 
     // 3. Düz CSS Çıktısı (Any kullanımı kaldırıldı)
     const generatePlainCss = (compName: string) => {
-        let baseCss = '';
+        let baseCss: string;
         if (activeComponent.raw_css) {
             baseCss = getProcessedCode(activeComponent.raw_css, 'css');
         } else {
@@ -305,7 +305,7 @@ export function ComponentPlayground() {
                     <div className="w-full h-full p-8 flex items-center justify-center">
                         <CodeViewer
                             code={getActiveCode()}
-                            language={(activeTab === 'css' ? 'css' : activeTab === 'react' ? 'react' : 'html') as any}
+                            language={(activeTab === 'css' ? 'css' : activeTab === 'react' ? 'react' : 'html') as 'react' | 'html' | 'css'}
                         />
                     </div>
                 )}
