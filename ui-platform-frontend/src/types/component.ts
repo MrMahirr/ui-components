@@ -5,5 +5,5 @@ export interface UIComponent {
     slug: string;
     raw_react: string | null;
     raw_html: string | null;
-    default_config: Record<string, any>;
+    default_config: Record<string, string | number | boolean>;
 }

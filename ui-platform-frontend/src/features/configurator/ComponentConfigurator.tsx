@@ -142,7 +142,7 @@ export function ComponentConfigurator() {
         { label: 'Full', value: '9999px' }
     ];
 
-    const isColorValue = (key: string, value: any): boolean => {
+    const isColorValue = (key: string, value: unknown): value is string => {
         if (typeof value !== 'string') return false;
         const valClean = value.trim().toLowerCase();
         return (
@@ -155,14 +155,14 @@ export function ComponentConfigurator() {
         );
     };
 
-    const renderControl = (key: string, value: any) => {
+    const renderControl = (key: string, value: unknown) => {
         if (typeof value === 'boolean') {
             return <ToggleControl checked={value} onChange={(val) => updateConfig(key, val)} />;
         }
         if (isColorValue(key, value)) {
             return <ColorControl value={value} onChange={(val) => updateConfig(key, val)} />;
         }
-        return <TextControl value={value} onChange={(val) => updateConfig(key, val)} />;
+        return <TextControl value={String(value)} onChange={(val) => updateConfig(key, val)} />;
     };
 
     const toggleSection = (section: string) => {

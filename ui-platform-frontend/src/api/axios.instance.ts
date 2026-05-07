@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// İleride .env dosyasına taşıyabilirsin (örn: import.meta.env.VITE_API_URL)
-const BASE_URL = 'http://localhost:3000';
+// Dinamik .env ortam değişkeninden veya local development fallback adresinden beslenir
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const axiosInstance = axios.create({
     baseURL: BASE_URL,
