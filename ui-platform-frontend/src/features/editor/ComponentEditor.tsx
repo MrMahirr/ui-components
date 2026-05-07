@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Save, LayoutTemplate, Code2, Settings2, X } from 'lucide-react';
 import { useCreateComponent, useUpdateComponent } from '../../hooks/useComponents';
-import { cn } from '../../utils/cn';
 import type { UIComponent } from '../../types/component';
 import { toast } from 'react-hot-toast';
+import { CodeField } from './CodeField';
 
 interface ComponentEditorProps {
     onSuccess: () => void;
@@ -126,47 +126,42 @@ export function ComponentEditor({ onSuccess, initialData }: ComponentEditorProps
 
                 {/* Code Editors Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="space-y-2 h-[400px] flex flex-col">
-                        <label className="flex items-center gap-2 text-[10px] font-black text-green-400 uppercase tracking-[0.2em]">
-                            <Code2 size={14} /> HTML & Tailwind
-                        </label>
-                        <textarea
-                            value={rawHtml}
-                            onChange={e => setRawHtml(e.target.value)}
-                            className="flex-1 w-full bg-[#0A0A0A] border border-border rounded-2xl p-4 text-xs font-mono text-green-400/80 focus:border-green-500/40 outline-none resize-none"
-                            placeholder='<button class="bg-[{{color}}]">...</button>'
-                        />
-                    </div>
-                    <div className="space-y-2 h-[400px] flex flex-col">
-                        <label className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-[0.2em]">
-                            <Code2 size={14} /> React (JSX)
-                        </label>
-                        <textarea
-                            value={rawReact}
-                            onChange={e => setRawReact(e.target.value)}
-                            className="flex-1 w-full bg-[#0A0A0A] border border-border rounded-2xl p-4 text-xs font-mono text-primary/80 focus:border-primary/40 outline-none resize-none"
-                            placeholder="export function MyButton() { ... }"
-                        />
-                    </div>
+                    <CodeField
+                        value={rawHtml}
+                        onChange={setRawHtml}
+                        language="html"
+                        label="HTML & Tailwind"
+                        labelIcon={<Code2 size={14} />}
+                        labelColorClass="text-green-400"
+                        placeholder='<button class="bg-[{{color}}]">...</button>'
+                        className="h-[400px]"
+                    />
+                    <CodeField
+                        value={rawReact}
+                        onChange={setRawReact}
+                        language="jsx"
+                        label="React (JSX)"
+                        labelIcon={<Code2 size={14} />}
+                        labelColorClass="text-primary"
+                        placeholder="export function MyButton() { ... }"
+                        className="h-[400px]"
+                    />
                 </div>
 
                 {/* Configuration Section */}
-                <div className="space-y-2 h-64 flex flex-col pb-10">
-                    <div className="flex justify-between items-center">
-                        <label className="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">
-                            <Settings2 size={14} /> Default Configuration (JSON)
-                        </label>
-                        {jsonError && <span className="text-[10px] text-red-400 font-bold bg-red-400/10 px-2 py-1 rounded">{jsonError}</span>}
-                    </div>
-                    <textarea
-                        value={configString}
-                        onChange={e => setConfigString(e.target.value)}
-                        className={cn(
-                            "flex-1 w-full bg-[#0A0A0A] border rounded-2xl p-4 text-xs font-mono transition-all outline-none resize-none",
-                            jsonError ? "border-red-500/50 text-red-400" : "border-border text-text-muted focus:border-primary/40"
-                        )}
-                    />
-                </div>
+                <CodeField
+                    value={configString}
+                    onChange={(val) => {
+                        setConfigString(val);
+                        setJsonError('');
+                    }}
+                    language="json"
+                    label="Default Configuration (JSON)"
+                    labelIcon={<Settings2 size={14} />}
+                    labelColorClass="text-text-muted"
+                    error={jsonError}
+                    className="h-64 pb-10"
+                />
             </div>
         </form>
     );
