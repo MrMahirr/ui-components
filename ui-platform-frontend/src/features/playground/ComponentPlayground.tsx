@@ -32,7 +32,7 @@ export function ComponentPlayground() {
         if (!code) return '';
         let processed = code;
         Object.entries(currentConfig).forEach(([key, value]) => {
-            processed = processed.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
+            processed = processed.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), String(value));
         });
 
         if (mode === 'css') {
@@ -50,12 +50,79 @@ export function ComponentPlayground() {
         return htmlToJsx(resolvedHtml, compName, mode, globalStyles, selectedFont);
     };
 
-    // 2.5. Ham React Kodu Şablon Değişkeni İşleyici
+    // Helper to generate styles matching Figma global styles layout configurator
+    const generateWrapperStyles = () => {
+        if (!globalStyles) return null;
+        const styles: Record<string, string | number> = {};
+        
+        styles.padding = `"${globalStyles.paddingY}px ${globalStyles.paddingX}px"`;
+        
+        if (globalStyles.borderWidth > 0) {
+            styles.border = `"${globalStyles.borderWidth}px solid ${globalStyles.borderColor}"`;
+        }
+        if (globalStyles.borderRadius && globalStyles.borderRadius !== '0px') {
+            styles.borderRadius = `"${globalStyles.borderRadius}"`;
+        }
+        if (globalStyles.opacity !== 100) {
+            styles.opacity = globalStyles.opacity / 100;
+        }
+        if (globalStyles.fontSize && globalStyles.fontSize !== 14) {
+            styles.fontSize = `"${globalStyles.fontSize}px"`;
+        }
+        if (globalStyles.fontWeight && globalStyles.fontWeight !== '400') {
+            styles.fontWeight = `"${globalStyles.fontWeight}"`;
+        }
+        if (globalStyles.letterSpacing && globalStyles.letterSpacing !== 'normal') {
+            const spacingValue = 
+                globalStyles.letterSpacing === 'tighter' ? '-0.05em' :
+                globalStyles.letterSpacing === 'tight' ? '-0.025em' :
+                globalStyles.letterSpacing === 'wide' ? '0.025em' :
+                globalStyles.letterSpacing === 'wider' ? '0.05em' :
+                globalStyles.letterSpacing === 'widest' ? '0.1em' : '0em';
+            styles.letterSpacing = `"${spacingValue}"`;
+        }
+        if (selectedFont && selectedFont !== 'Inter') {
+            styles.fontFamily = `"'${selectedFont}', sans-serif"`;
+        }
+        if (globalStyles.glowBlur > 0) {
+            styles.boxShadow = `"0 0 ${globalStyles.glowBlur}px ${globalStyles.glowSpread}px ${globalStyles.glowColor}"`;
+        }
+        
+        return styles;
+    };
+
+    const getReactWrapperStyleString = () => {
+        const styles = generateWrapperStyles();
+        if (!styles || Object.keys(styles).length === 0) return '';
+        const props = Object.entries(styles)
+            .map(([key, val]) => `${key}: ${val}`)
+            .join(', ');
+        return ` style={{ ${props} }}`;
+    };
+
+    // 2.5. Ham React Kodu Şablon Değişkeni İşleyici ile Global Layout Entegrasyonu
     const getProcessedReactCode = (reactCode: string) => {
         let processed = reactCode;
         Object.entries(currentConfig).forEach(([key, value]) => {
             processed = processed.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), String(value));
         });
+
+        const stylePropsStr = getReactWrapperStyleString();
+        if (stylePropsStr) {
+            // Find return statement block (e.g. return ( ... );)
+            const returnRegex = /(return\s*\(\s*)([\s\S]*?)(\s*\);)/;
+            if (returnRegex.test(processed)) {
+                processed = processed.replace(returnRegex, (_, retStart, body, retEnd) => {
+                    // Prevent duplicate wrapping
+                    if (body.includes('className="ui-component-wrapper"')) {
+                        return `${retStart}${body}${retEnd}`;
+                    }
+                    // Indent the original JSX block
+                    const indentedBody = body.split('\n').map((line: string) => `  ${line}`).join('\n');
+                    return `${retStart}<div className="ui-component-wrapper"${stylePropsStr}>\n${indentedBody}\n  </div>${retEnd}`;
+                });
+            }
+        }
         return processed;
     };
 

@@ -132,7 +132,7 @@ export function SandboxIframe({
                 };
                 box-shadow: ${globalStyles.glowBlur > 0 ? `0 0 ${globalStyles.glowBlur}px ${globalStyles.glowSpread}px ${globalStyles.glowColor}` : 'none'};
                 transition: all 0.25s ease;
-                display: flex;
+                display: inline-flex;
                 align-items: center;
                 justify-content: center;
             }
@@ -174,7 +174,9 @@ export function SandboxIframe({
                         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     }
                     #component-preview-wrapper {
-                        width: 100%;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
                         max-width: 100%;
                         box-sizing: border-box;
                     }
