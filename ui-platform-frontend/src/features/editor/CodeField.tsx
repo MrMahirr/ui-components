@@ -1,4 +1,4 @@
-import Editor from 'react-simple-code-editor';
+import SimpleCodeEditor from 'react-simple-code-editor';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
@@ -7,6 +7,9 @@ import 'prismjs/components/prism-jsx';
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-json';
 import { cn } from '../../utils/cn';
+
+// Handle ESModule / CommonJS default import discrepancy in Vite
+const Editor = (SimpleCodeEditor as any).default || SimpleCodeEditor;
 
 interface CodeFieldProps {
     value: string;
@@ -20,6 +23,7 @@ interface CodeFieldProps {
     error?: string;
     className?: string;
 }
+
 
 /**
  * SOLID-compliant, highly-typed reusable code editor field.
@@ -59,7 +63,7 @@ export function CodeField({
         return Prism.highlight(code || '', grammar || Prism.languages.clike, language);
     };
 
-    const lineCount = value.split('\n').length;
+    const lineCount = (value || '').split('\n').length;
 
     return (
         <div className={cn("space-y-2 flex flex-col h-full", className)}>
@@ -76,14 +80,14 @@ export function CodeField({
             </div>
 
             <div className={cn(
-                "flex-1 w-full bg-[#05050A]/60 backdrop-blur-md border rounded-2xl overflow-auto flex relative scrollbar-custom transition-all duration-300",
+                "flex-1 w-full bg-[var(--color-editor-bg)] backdrop-blur-md border rounded-2xl overflow-auto flex relative scrollbar-custom transition-all duration-300",
                 error 
                     ? "border-red-500/30 focus-within:border-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.05)]" 
                     : "border-border focus-within:border-primary/40 focus-within:shadow-[0_0_20px_rgba(0,210,255,0.05)]"
             )}>
                 {/* Synchronized Sticky Gutter for Line Numbers */}
                 {showLineNumbers && (
-                    <div className="sticky left-0 bg-[#05050A] select-none text-right py-4 pr-3.5 pl-4 border-r border-border text-text-muted/20 font-mono text-[13px] leading-[1.6] z-10 shrink-0 min-w-[2.75rem]">
+                    <div className="sticky left-0 bg-[var(--color-editor-gutter)] select-none text-right py-4 pr-3.5 pl-4 border-r border-border text-text-muted/30 font-mono text-[13px] leading-[1.6] z-10 shrink-0 min-w-[2.75rem]">
                         {Array.from({ length: lineCount }).map((_, i) => (
                             <div key={i}>{i + 1}</div>
                         ))}
@@ -93,7 +97,7 @@ export function CodeField({
                 {/* Code Input & Highlighter Overlay */}
                 <div className="flex-1 relative min-h-full">
                     <Editor
-                        value={value}
+                        value={value || ''}
                         onValueChange={onChange}
                         highlight={highlightCode}
                         padding={16}
