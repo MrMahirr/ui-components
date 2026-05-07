@@ -1,6 +1,7 @@
-import {LayoutTemplate, Search} from 'lucide-react';
+import {Search} from 'lucide-react';
 import {ThemeSwitcher} from '../ui/ThemeSwitcher';
 import {useSearch} from '../../hooks/useSearch';
+import logoImg from '../../assets/logo.png';
 
 export function Navbar() {
     const { toggle } = useSearch();
@@ -9,11 +10,13 @@ export function Navbar() {
         <header
             className="h-16 rounded-2xl border border-border bg-surface backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-10 shadow-lg">
             <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-xl text-primary shadow-[0_0_15px_rgba(0,210,255,0.2)]">
-                    <LayoutTemplate size={20} strokeWidth={2.5}/>
-                </div>
+                <img 
+                    src={logoImg} 
+                    alt="UI Platform Logo" 
+                    className="w-15 h-15 object-contain filter drop-shadow-[0_0_15px_rgba(0,210,255,0.5)] transition-all duration-300 hover:scale-105 active:scale-95" 
+                />
                 <h1 className="font-bold text-lg tracking-wide bg-gradient-to-r from-text-main to-text-muted bg-clip-text text-transparent">
-                    UI Platform
+                    UI Manager
                 </h1>
             </div>
 
